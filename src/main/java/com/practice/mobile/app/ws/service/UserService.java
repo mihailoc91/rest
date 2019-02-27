@@ -6,12 +6,14 @@
 package com.practice.mobile.app.ws.service;
 
 import com.practice.mobile.app.ws.shared.dto.UserDto;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 /**
  *
  * @author Mihailo
  */
-public interface UserService {
+public interface UserService extends UserDetailsService{
     
     UserDto createUser (UserDto user);
+    UserDto getUser (String email);
 }
