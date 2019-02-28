@@ -5,11 +5,13 @@
  */
 package com.practice.mobile.app.ws.service.impl;
 
+import com.practice.mobile.app.ws.exceptions.UserServiceException;
 import com.practice.mobile.app.ws.io.repositories.UserRepository;
 import com.practice.mobile.app.ws.io.entity.UserEntity;
 import com.practice.mobile.app.ws.service.UserService;
 import com.practice.mobile.app.ws.shared.Utils;
 import com.practice.mobile.app.ws.shared.dto.UserDto;
+import com.practice.mobile.app.ws.ui.model.response.ErrorMessages;
 import java.util.ArrayList;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,6 +79,46 @@ public class UserServiceImpl implements UserService{
         BeanUtils.copyProperties(userEntity, returnValue);
         
         return returnValue;
+    }
+
+    @Override
+    public UserDto getUserByUserId(String userId) {
+        
+        UserEntity userEntity = userRepository.findByUserId(userId);
+        if(userEntity == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+        
+        UserDto returnValue = new UserDto();
+        BeanUtils.copyProperties(userEntity, returnValue);
+        
+        return returnValue;
+    }
+
+    @Override
+    public UserDto updateUser(String userId, UserDto user) {
+        UserDto returnValue = new UserDto();
+        UserEntity userEntity = userRepository.findByUserId(userId);
+        
+        if (userEntity == null) {
+            throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+        }
+
+        userEntity.setFirstName(user.getFirstName());
+        userEntity.setLastName(user.getLastName());
+
+        UserEntity updatedUserDetails = userRepository.save(userEntity);
+        BeanUtils.copyProperties(updatedUserDetails, returnValue);
+
+        return returnValue;
+    }
+
+    @Override
+    public void deleteUser(String userId) {
+        UserEntity userEntity = userRepository.findByUserId(userId);
+        if (userEntity == null) {
+            throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+        }
+        
+        userRepository.delete(userEntity);
     }
     
 }
